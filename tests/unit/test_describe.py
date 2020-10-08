@@ -102,7 +102,7 @@ def describe_data():
             np.nan,
             datetime.datetime(1990, 12, 9),
             datetime.datetime(1950, 12, 9),
-            datetime.datetime(1898, 1, 2),
+            datetime.datetime(1902, 1, 2),
             datetime.datetime(1950, 12, 9),
             datetime.datetime(1950, 12, 9),
         ],
@@ -349,7 +349,7 @@ def expected_results():
             "mad": check_is_NaN,
             "max": datetime.datetime(2022, 1, 1, 13, 57),
             "mean": check_is_NaN,
-            "min": datetime.datetime(1898, 1, 2),
+            "min": datetime.datetime(1902, 1, 2),
             "n_missing": 1,
             "p_missing": 0.11111111111111116,
             "p_distinct": 5 / 8,
@@ -632,12 +632,10 @@ def test_describe_spark_df(
     summarizer,
     typeset,
     spark_session,
-    spark_context,
 ):
     config["vars"]["num"]["low_categorical_threshold"].set(0)
 
     spark = spark_session
-    sc = spark_context
     if column == "mixed":
         describe_data[column] = [str(i) for i in describe_data[column]]
     if column == "bool_tf_with_nan":

@@ -3,6 +3,7 @@ import sys
 from pathlib import Path
 
 import pytest
+from pyspark.sql import SparkSession
 
 from pandas_profiling.model.summarizer import PandasProfilingSummarizer
 from pandas_profiling.model.typeset import ProfilingTypeSet
@@ -55,3 +56,23 @@ def pytest_runtest_setup(item):
     plat = sys.platform
     if supported_platforms and plat not in supported_platforms:
         pytest.skip("cannot run on platform {}".format(plat))
+
+
+spark_configs = [[("spark.sql.execution.arrow.pyspark.enabled", "true")],
+                 [("spark.sql.execution.arrow.pyspark.enabled", "false")]]
+
+
+@pytest.fixture(scope="session", params=spark_configs)
+def spark_session(request):
+    spark_session = (SparkSession
+                     .builder
+                     .master("local[2]")
+                     .enableHiveSupport()
+                     .config("spark.network.timeout", "500s"))
+
+    for conf in request.param:
+        spark_session = spark_session.config(conf[0], conf[1])
+    spark_session = spark_session.getOrCreate()
+
+    yield spark_session
+    spark_session.stop()
